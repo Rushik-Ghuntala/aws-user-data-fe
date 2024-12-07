@@ -1,101 +1,145 @@
-import Image from "next/image";
+'use client'
+
+import React, { useState } from 'react';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+import axios from 'axios';
+
+interface User {
+  first_name: string;
+  last_name: string;
+  address?: string;
+  phone?: string;
+  email: string;
+}
+
+const UserSchema = Yup.object().shape({
+  first_name: Yup.string().required('First Name is required'),
+  last_name: Yup.string().required('Last Name is required'),
+  email: Yup.string().email('Invalid email').required('Email is required'),
+  address: Yup.string(),
+  phone: Yup.string()
+});
+
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}`;
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [users, setUsers] = useState<User[]>([]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get<User[]>(API_URL);
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const handleSubmit = async (values: User, { resetForm }: any) => {
+    try {
+      await axios.post(API_URL, values);
+      resetForm();
+      fetchUsers();
+    } catch (error) {
+      console.error('Error submitting user:', error);
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">User Management</h1>
+      
+      <Formik
+        initialValues={{
+          first_name: '',
+          last_name: '',
+          email: '',
+          address: '',
+          phone: ''
+        }}
+        validationSchema={UserSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ errors, touched }) => (
+          <Form className="space-y-4">
+            <div>
+              <label>First Name</label>
+              <Field 
+                name="first_name" 
+                className="border p-2 w-full"
+              />
+              {errors.first_name && touched.first_name && (
+                <div className="text-red-500">{errors.first_name}</div>
+              )}
+            </div>
+            
+            <div>
+              <label>Last Name</label>
+              <Field 
+                name="last_name" 
+                className="border p-2 w-full"
+              />
+              {errors.last_name && touched.last_name && (
+                <div className="text-red-500">{errors.last_name}</div>
+              )}
+            </div>
+            
+            <div>
+              <label>Email</label>
+              <Field 
+                name="email" 
+                type="email" 
+                className="border p-2 w-full"
+              />
+              {errors.email && touched.email && (
+                <div className="text-red-500">{errors.email}</div>
+              )}
+            </div>
+            
+            <div>
+              <label>Address</label>
+              <Field 
+                name="address" 
+                className="border p-2 w-full"
+              />
+            </div>
+            
+            <div>
+              <label>Phone</label>
+              <Field 
+                name="phone" 
+                className="border p-2 w-full"
+              />
+            </div>
+            
+            <button 
+              type="submit" 
+              className="bg-blue-500 text-white p-2 rounded"
+            >
+              Submit
+            </button>
+          </Form>
+        )}
+      </Formik>
+
+      <button 
+        onClick={fetchUsers} 
+        className="bg-green-500 text-white p-2 rounded mt-4"
+      >
+        Fetch Users
+      </button>
+
+      <div className="mt-4">
+        <h2 className="text-xl font-bold">Users</h2>
+        {users.map((user, index) => (
+          <div key={index} className="border p-2 mb-2">
+            <p>Name: {user.first_name} {user.last_name}</p>
+            <p>Email: {user.email}</p>
+            {user.address && <p>Address: {user.address}</p>}
+            {user.phone && <p>Phone: {user.phone}</p>}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
