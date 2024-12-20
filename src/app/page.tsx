@@ -59,7 +59,9 @@ export default function Home() {
         </a>
       </nav>
 
-      <h1 className="text-3xl font-extrabold text-pink-700 text-center mb-6">User Management</h1>
+      <h1 className="text-3xl font-extrabold text-pink-700 text-center mb-6">
+        User Management
+      </h1>
 
       <Formik
         initialValues={{
@@ -75,7 +77,9 @@ export default function Home() {
         {({ errors, touched }) => (
           <Form className="space-y-4 bg-white p-6 rounded-lg shadow-lg border border-pink-200">
             <div>
-              <label className="block text-purple-700 font-medium">First Name</label>
+              <label className="block text-purple-700 font-medium">
+                First Name
+              </label>
               <Field
                 name="first_name"
                 className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-pink-300"
@@ -86,7 +90,9 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block text-purple-500 font-medium">Last Name</label>
+              <label className="block text-purple-500 font-medium">
+                Last Name
+              </label>
               <Field
                 name="last_name"
                 className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-pink-300"
@@ -109,7 +115,9 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block text-purple-700 font-medium">Address</label>
+              <label className="block text-purple-700 font-medium">
+                Address
+              </label>
               <Field
                 name="address"
                 className="border rounded-lg p-2 w-full focus:ring-2 focus:ring-pink-300"
@@ -158,7 +166,9 @@ export default function Home() {
             </div>
           ))
         ) : (
-          <p className="text-pink-500">No users available. Click "Fetch Users" to load data.</p>
+          <p className="text-pink-500">
+            No users available. Click &quot;Fetch Users&quot; to load data.
+          </p>
         )}
       </div>
     </div>
